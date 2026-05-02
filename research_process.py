@@ -1,3 +1,4 @@
+import itertools
 import random
 from abc import ABC, abstractmethod
 from typing import Dict, List
@@ -126,3 +127,39 @@ class GeneticAlgorithmProcess(ResearchProcessBase):
                 new_genes.append(child)
 
             self._generation_iter(gen_i, new_genes)
+
+
+class GridSearchProcess(ResearchProcessBase):
+    """Exhaustive search: try every combination of values in alpha_space."""
+
+    def __init__(self, name: str, scorer, alpha_template: str, alpha_space: dict,
+                 alpha_settings: dict):
+        super().__init__(name, scorer)
+        self.template = alpha_template
+        self.alpha_space = alpha_space
+        self.alpha_settings = alpha_settings
+
+    def _generate_expr(self, gene: dict) -> str:
+        expr = self.template
+        for placeholder, value in gene.items():
+            expr = expr.replace(placeholder, value)
+        return expr
+
+    def run(self):
+        placeholders = list(self.alpha_space.keys())
+        value_lists = [self.alpha_space[p] for p in placeholders]
+
+        alphas = []
+        for i, combo in enumerate(itertools.product(*value_lists)):
+            gene = dict(zip(placeholders, combo))
+            name = self.generate_alpha_name(0, i)
+            expr = self._generate_expr(gene)
+            payload = {
+                'type': 'REGULAR',
+                'settings': self.alpha_settings,
+                'regular': expr,
+            }
+            alphas.append(Alpha(name=name, payload=payload))
+
+        print(f'[grid] Generated {len(alphas)} combinations')
+        self.sim_alphas(alphas)

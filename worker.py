@@ -47,7 +47,7 @@ class BrainSession:
             resp = getattr(self._sess, method)(*args, **kwargs)
         if resp.status_code in [200, 201]:
             return resp
-        raise Exception(f'Request failed: status={resp.status_code}, headers={resp.headers}')
+        raise Exception(f'Request failed: status={resp.status_code}, reason={resp.reason}, headers={resp.headers}')
 
     def get(self, *args, **kwargs):
         return self._request('get', *args, **kwargs)
