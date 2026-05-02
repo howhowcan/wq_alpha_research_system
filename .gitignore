@@ -1,0 +1,5 @@
+db/*
+.claude
+__pycache__/*
+*.txt
+test_api_result.json
