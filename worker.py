@@ -28,10 +28,10 @@ class BrainSession:
         else:
             self._sess = requests.Session()
             with open(_CREDENTIAL_FILE, 'r') as f:
-                cred = json.load(f)
+                cred_dict = json.load(f)
+            self._sess.auth = (cred_dict["email"], cred_dict["password"])
             self._sess.post(
-                'https://api.worldquantbrain.com/authentication',
-                json={'email': cred['email'], 'password': cred['password']},
+                'https://api.worldquantbrain.com/authentication'
             ).raise_for_status()
             with open(_SESSION_CACHE, 'wb') as f:
                 pickle.dump(self._sess, f)
@@ -80,6 +80,7 @@ class Worker:
         return result
 
     def _post_payload(self, alpha: Alpha) -> Tuple[bool, str]:
+        print("sending alpha: {}".format(json.dumps(alpha.payload)))
         resp = self.sess.post('https://api.worldquantbrain.com/simulations', json=alpha.payload)
         if resp.status_code in [200, 201] and 'Location' in resp.headers:
             return (True, resp.headers['Location'])

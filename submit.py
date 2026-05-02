@@ -12,7 +12,11 @@ from research_process import GeneticAlgorithmProcess
 def submit_single(name: str, expression: str, settings: dict):
     """Submit a single alpha expression."""
     init_db()
-    payload = {**settings, 'regular': expression}
+    payload = {
+        'type': 'REGULAR',
+        'settings': settings,
+        'regular': expression,
+    }
     alpha = Alpha(name=name, payload=payload)
     alpha.dump()
     print(f'[submit] {alpha.filename} -> {alpha.filepath}')
@@ -57,13 +61,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     default_settings = {
-        'type': 'REGULAR',
+        'instrumentType': 'EQUITY',
         'region': 'USA',
         'universe': 'TOP3000',
         'delay': 1,
-        'decay': 0,
+        'decay': 15,
         'neutralization': 'SUBINDUSTRY',
         'truncation': 0.08,
+        'pasteurization': 'ON',
+        'testPeriod': 'P1Y6M',
+        'unitHandling': 'VERIFY',
+        'nanHandling': 'OFF',
+        'language': 'FASTEXPR',
+        'visualization': False,
     }
 
     if args.command == 'single':

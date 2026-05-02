@@ -73,7 +73,11 @@ class GeneticAlgorithmProcess(ResearchProcessBase):
         for i, gene in enumerate(genes):
             name = self.generate_alpha_name(gen_i, i)
             expr = self._generate_expr(gene)
-            payload = {**self.alpha_settings, 'regular': expr}
+            payload = {
+                'type': 'REGULAR',
+                'settings': self.alpha_settings,
+                'regular': expr,
+            }
             alpha = Alpha(name=name, payload=payload)
             alphas.append(alpha)
             gen_gene_map[name] = gene
